@@ -2,6 +2,7 @@ package com.learnreactivespring.fluxandmonoplayground;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class FluxAndMonoTest {
@@ -103,6 +104,28 @@ public class FluxAndMonoTest {
                 .expectErrorMessage("Exception Occurred")
                 /* Aqui, como temos uma exception, o stream não vai completar, então o verifyComplete()
                  * não faz sentido. Nesse cenário, registramos a exception acima e chamamos o verify(). */
+                .verify();
+    }
+
+    @Test
+    public void monoTest() {
+
+        Mono<String> stringMono = Mono.just("Spring");
+
+        /* Depois que criei o Mono, posso chamar os métodos, como nesse caso que chamo o log e depois passo
+         * a instância para o create. */
+        StepVerifier.create(stringMono.log())
+                .expectNext("Spring")
+                .verifyComplete();
+    }
+
+    @Test
+    public void monoTest_Error() {
+
+        /* Como o mono é somente um elemento, posso chamar direto o error, que ele já cria um Mono
+         * que retorna um erro. */
+        StepVerifier.create(Mono.error(new RuntimeException("Exception Occurred")).log())
+                .expectError(RuntimeException.class)
                 .verify();
     }
 }
