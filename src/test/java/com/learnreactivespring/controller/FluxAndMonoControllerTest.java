@@ -89,4 +89,29 @@ public class FluxAndMonoControllerTest {
                 });
     }
 
+    @Test
+    public void fluxStream() {
+
+        Flux<Long> longStreamFlux = webTestClient.get().uri("/fluxstream")
+                .accept(MediaType.APPLICATION_STREAM_JSON)
+                /* Faz a chamada ao endpoint. Atua como se fosse um subscriber. */
+                .exchange()
+                /* Espera que o resultado seja ok */
+                .expectStatus().isOk()
+                /* O resultado vai ser do tipo Integer. */
+                .returnResult(Long.class)
+                .getResponseBody();
+
+        StepVerifier.create(longStreamFlux)
+                .expectNext(0l)
+                .expectNext(1l)
+                .expectNext(2l)
+                /* Como temos um stream infinito, não podemos testar todos os valores, então testamos
+                 * os primeiros e mandamos o cancel(), para remover o subscription, e validamos
+                 * os primeiros valores recebidos. */
+                .thenCancel()
+                .verify();
+
+    }
+
 }
