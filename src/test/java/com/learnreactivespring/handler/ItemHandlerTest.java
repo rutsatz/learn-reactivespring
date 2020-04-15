@@ -61,4 +61,21 @@ public class ItemHandlerTest {
                 .hasSize(4);
     }
 
+    @Test
+    public void getOneItem() {
+        webTestClient.get().uri(ItemConstants.ITEM_FUNCTIONAL_END_POINT_V1.concat("/{id}"), "ABC")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                /* Verifica o preço retornado no json. */
+                .jsonPath("$.price", 149.99);
+    }
+
+    @Test
+    public void getOneItem_notFound() {
+        webTestClient.get().uri(ItemConstants.ITEM_FUNCTIONAL_END_POINT_V1.concat("/{id}"), "DEF")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
 }
