@@ -1,0 +1,32 @@
+spring:
+  profiles:
+    # Profile ativo por default ao subir a aplicação.
+    active: dev
+
+# --- separa um profile do outro.
+---
+spring:
+  profiles: dev
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
+# --- separa um profile do outro.
+---
+spring:
+  profiles: nonprod
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
+# --- separa um profile do outro.
+---
+spring:
+  profiles: prod
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
