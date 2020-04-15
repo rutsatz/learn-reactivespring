@@ -86,7 +86,7 @@ public class ItemReactiveRepositoryTest {
     @Test
     public void updateItem() {
         double newPrice = 520.0;
-        Flux<Item> updatedItem = itemReactiveRepository.findByDescription("LG TV")
+        Mono<Item> updatedItem = itemReactiveRepository.findByDescription("LG TV")
                 .map(item -> {
                     item.setPrice(newPrice);
                     return item;
@@ -98,6 +98,54 @@ public class ItemReactiveRepositoryTest {
         StepVerifier.create(updatedItem)
                 .expectSubscription()
                 .expectNextMatches(item -> item.getPrice() == 520.0)
+                .verifyComplete();
+    }
+
+    @Test
+    public void deleteItemById() {
+        Mono<Void> deletedItem = itemReactiveRepository
+                /* Retorna um Mono<Item>. */
+                .findById("ABC")
+                /* Converte de Mono<Item> para String. */
+                .map(Item::getId)
+                /* Pega a String com o id e deleta. */
+                .flatMap(id ->
+                        /* deleteById retorna um Mono<Void>. */
+                        itemReactiveRepository.deleteById(id));
+
+        StepVerifier.create(deletedItem.log())
+                .expectSubscription()
+                /* Como é um delete, não podemos esperar nada de retorno, por isso
+                 * chamamos direto o verifyComplete(), pois não pode haver nenhum outro
+                 * evento além do subscribe e onComplete. */
+                .verifyComplete();
+
+        StepVerifier.create(itemReactiveRepository.findAll().log("The new Item List : "))
+                /* Garantir que ele foi deletado do banco, */
+                .expectNextCount(4)
+                .verifyComplete();
+    }
+
+    @Test
+    public void deleteItem() {
+        Mono<Void> deletedItem = itemReactiveRepository
+                /* Retorna um Mono<Item>. */
+                .findByDescription("LG TV")
+                /* Deleta usando direto o objeto.. */
+                .flatMap(item ->
+                        /* deleteById retorna um Mono<Void>. */
+                        itemReactiveRepository.delete(item));
+
+        StepVerifier.create(deletedItem.log())
+                .expectSubscription()
+                /* Como é um delete, não podemos esperar nada de retorno, por isso
+                 * chamamos direto o verifyComplete(), pois não pode haver nenhum outro
+                 * evento além do subscribe e onComplete. */
+                .verifyComplete();
+
+        StepVerifier.create(itemReactiveRepository.findAll().log("The new Item List : "))
+                /* Garantir que ele foi deletado do banco, */
+                .expectNextCount(4)
                 .verifyComplete();
     }
 
