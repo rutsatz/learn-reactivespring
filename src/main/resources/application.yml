@@ -30,3 +30,9 @@ spring:
       host: localhost
       port: 27017
       database: local
+
+---
+spring:
+  # profile para rodar os testes, para evitar a conexão no banco e os comandos
+  # do CommandLineRunner.
+  profiles: test

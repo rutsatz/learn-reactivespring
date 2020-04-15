@@ -4,13 +4,18 @@ import com.learnreactivespring.document.Item;
 import com.learnreactivespring.repository.ItemReactiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Não deve ser executado no profile de teste.
+ */
 @Component
+@Profile("!test")
 public class ItemDataInitializer implements CommandLineRunner {
 
     @Autowired
