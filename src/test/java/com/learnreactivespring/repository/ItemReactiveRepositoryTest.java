@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.test.annotation.DirtiesContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -14,8 +15,13 @@ import java.util.List;
 
 /**
  * @DataMongoTest carrega apenas as classes necessárias para fazer o teste com o mongo embarcado.
+ * @DirtiesContext é necessário quando vamos fazer testes que alteram o contexto da aplicação, como
+ * por exemplo, o saveItem(). Se eu rodo o teste individual, sem colocar essa annotation, ele passa,
+ * mas quando ele roda dentro do build do gradle, ele dá erro se não tivermos colocado ela.
+ * Basicamente, cada novo teste executado, ganha um contexto novo.
  */
 @DataMongoTest
+@DirtiesContext
 public class ItemReactiveRepositoryTest {
 
     @Autowired

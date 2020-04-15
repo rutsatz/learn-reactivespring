@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -13,7 +14,14 @@ import reactor.test.StepVerifier;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @DirtiesContext é necessário quando vamos fazer testes que alteram o contexto da aplicação, como
+ * por exemplo, o saveItem(). Se eu rodo o teste individual, sem colocar essa annotation, ele passa,
+ * mas quando ele roda dentro do build do gradle, ele dá erro se não tivermos colocado ela.
+ * Basicamente, cada novo teste executado, ganha um contexto novo.
+ */
 @WebFluxTest
+@DirtiesContext
 public class FluxAndMonoControllerTest {
 
     /**
