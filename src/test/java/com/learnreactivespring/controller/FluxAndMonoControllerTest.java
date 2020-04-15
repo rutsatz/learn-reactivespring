@@ -3,7 +3,9 @@ package com.learnreactivespring.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
@@ -20,7 +22,8 @@ import java.util.List;
  * mas quando ele roda dentro do build do gradle, ele dá erro se não tivermos colocado ela.
  * Basicamente, cada novo teste executado, ganha um contexto novo.
  */
-@WebFluxTest
+@SpringBootTest
+@AutoConfigureWebTestClient
 @DirtiesContext
 public class FluxAndMonoControllerTest {
 
