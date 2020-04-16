@@ -1,6 +1,8 @@
 package com.learnreactivespring.handler;
 
 import com.learnreactivespring.document.Item;
+import com.learnreactivespring.document.ItemCapped;
+import com.learnreactivespring.repository.ItemReactiveCappedRepository;
 import com.learnreactivespring.repository.ItemReactiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,9 @@ public class ItemsHandler {
 
     @Autowired
     ItemReactiveRepository itemReactiveRepository;
+
+    @Autowired
+    ItemReactiveCappedRepository itemReactiveCappedRepository;
 
     static Mono<ServerResponse> notFound = ServerResponse.notFound().build();
 
@@ -80,5 +85,15 @@ public class ItemsHandler {
 
     public Mono<ServerResponse> itemsEx(ServerRequest serverRequest) {
         throw new RuntimeException("RuntimeException Occurred");
+    }
+
+    public Mono<ServerResponse> itemsStream(ServerRequest serverRequest) {
+
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_STREAM_JSON)
+                /* findItemsBy() usa um cursor tailable, que dá a capacidade de stream. */
+                .body(itemReactiveCappedRepository.findItemsBy(), ItemCapped.class);
+
+
     }
 }
