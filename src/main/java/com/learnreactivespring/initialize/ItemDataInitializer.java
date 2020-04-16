@@ -2,7 +2,9 @@ package com.learnreactivespring.initialize;
 
 import com.learnreactivespring.document.Item;
 import com.learnreactivespring.document.ItemCapped;
+import com.learnreactivespring.repository.ItemReactiveCappedRepository;
 import com.learnreactivespring.repository.ItemReactiveRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -11,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,10 +22,14 @@ import java.util.List;
  */
 @Component
 @Profile("!test")
+@Slf4j
 public class ItemDataInitializer implements CommandLineRunner {
 
     @Autowired
     private ItemReactiveRepository itemReactiveRepository;
+
+    @Autowired
+    private ItemReactiveCappedRepository itemReactiveCappedRepository;
 
     @Autowired
     MongoOperations mongoOperations;
@@ -32,6 +39,7 @@ public class ItemDataInitializer implements CommandLineRunner {
 
         initialDataSetUp();
         createCappedCollection();
+        dataSetUpForCappedCollection();
     }
 
     private void createCappedCollection() {
@@ -60,4 +68,19 @@ public class ItemDataInitializer implements CommandLineRunner {
                 .thenMany(itemReactiveRepository.findAll())
                 .subscribe(item -> System.out.println("Item inserted from CommandLineRunner : " + item));
     }
+
+    private void dataSetUpForCappedCollection() {
+        /* Cria um novo item a cada segundo. */
+        Flux<ItemCapped> itemCappedFlux = Flux.interval(Duration.ofSeconds(1))
+                .map(i -> new ItemCapped(null, "Random Item " + i, 100.0 + i));
+
+        itemReactiveCappedRepository
+                /* O insert faz o subscribe no flux, e a cada novo item emitido, ele faz o insert na
+                 * base. */
+                .insert(itemCappedFlux)
+                .subscribe(itemCapped -> {
+                    log.info("Inserted Item is " + itemCapped);
+                });
+    }
+
 }
