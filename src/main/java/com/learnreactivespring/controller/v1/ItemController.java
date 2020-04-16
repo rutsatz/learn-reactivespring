@@ -15,6 +15,12 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ItemController {
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        log.error("Exception caught in handleRuntimeException : {} ", ex.toString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
     @Autowired
     private ItemReactiveRepository itemReactiveRepository;
 
@@ -60,6 +66,12 @@ public class ItemController {
                 })
                 .map(updatedItem -> new ResponseEntity<>(updatedItem, HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(ItemConstants.ITEM_END_POINT_V1 + "/runtimeException")
+    public Flux<Item> runtimeException() {
+        return itemReactiveRepository.findAll()
+                .concatWith(Mono.error(new RuntimeException("RuntimeException Occurred.")));
     }
 
 }
